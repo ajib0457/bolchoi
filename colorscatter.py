@@ -1,7 +1,6 @@
 import numpy as np
 import math as mth
 import pandas as pd
-import h5py
 #Initial data from density field and classification
 grid_nodes=2000
 sim_sz=250#Mpc
@@ -12,10 +11,6 @@ s=3.92
 grid_phys=1.*sim_sz/grid_nodes#Size of each voxel in physical units
 val_phys=1.*(2*fnl_val)/grid_nodes#Value in each grid voxel
 std_dev_phys=1.*s/val_phys*grid_phys
-
-recon_vecs_x=np.zeros((grid_nodes**3))
-recon_vecs_y=np.zeros((grid_nodes**3))
-recon_vecs_z=np.zeros((grid_nodes**3))
 
 for part in range(tot_parts):#here I have to figure out how these have been stored then put them back together, probably just column stack all
 #into 1 array
