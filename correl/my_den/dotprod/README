@@ -1,0 +1,1 @@
+This code grabs the resultant eigenvectors from post_hess and the AM from the catalogue to then calculate the dotproduct between them
