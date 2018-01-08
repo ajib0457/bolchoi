@@ -3,8 +3,21 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import h5py
 import pandas as pd
-f=h5py.File("/import/oth3/ajib0457/bolchoi_z0/investigation/halo_color_500part.h5", 'r')
+
+#Initial data from density field and classification
+grid_den=850
+sim_sz=250#Mpc
+in_val,fnl_val=-140,140
+tot_parts=8     #pertains to eigenvector files, not mass bins
+s=3.92
+#Calculate the std deviation in physical units
+grid_phys=1.*sim_sz/grid_den#Size of each voxel in physical units
+val_phys=1.*(2*fnl_val)/grid_den#Value in each grid voxel
+std_dev_phys=1.*s/val_phys*grid_phys
+
+f=h5py.File("/import/oth3/ajib0457/bolchoi_z0/investigation/bolchoi_halo_colordata_grid%s_smth%s_500part.h5"%(grid_den,round(std_dev_phys,2)), 'r')
 data_in=f['/group/x'][:]#already filtered for >=500
+
 mass = pd.read_csv('/import/oth3/ajib0457/bolchoi_z0/catalogs/rockstar/bolchoi_DTFE_rockstar_halos_z0_xyz_m_j',sep=r"\s+",lineterminator='\n', header = None)
 mass=mass.as_matrix()
 
@@ -19,8 +32,7 @@ data=np.column_stack((data_in,mass[:,3],rad[:,1]))
 slc=10#30 slices per 0.1 length
 x,y,z=0,1,2#slice through which axis
 box=np.max(data[:,0])#subset box length
-grid_den=2000#density field grid resolution
-partcl_thkns=0.125#Thickness of the particle slice, Mpc
+partcl_thkns=5#Thickness of the particle slice, Mpc
 lo_lim_partcl=1.*slc/(grid_den)*box-1.*partcl_thkns/2 #For particle distribution
 hi_lim_partcl=lo_lim_partcl+partcl_thkns #For particle distributionn
 
