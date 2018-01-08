@@ -1,0 +1,30 @@
+#!/bin/bash
+
+#     job name:
+#PBS -N DTFE__AM_sitgrid_bolchoi_box_cutout_sz850
+#     how many cpus?
+#PBS -l select=1:ncpus=1:mem=64GB
+      
+#     How long to run the job? (hours:minutes:seconds)
+#PBS -l walltime=01:00:00
+#PBS -q scavenger
+#     Name of output file:
+#PBS -o slc_output.txt
+
+#PBS -P RDS-FSC-GAMNSCM2-RW
+#     Environmental varibles to make it work:
+
+#PBS -M ajib0457@uni.sydney.edu.au
+
+#PBS -m abe 
+
+module load python
+module load hdf5
+cd $PBS_O_WORKDIR
+ 
+#     Launching the job!
+
+python AM_sitgrid.py 
+
+
+
