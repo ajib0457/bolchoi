@@ -1,1 +1,3 @@
-
+hessian comp is broken up into 6 codes at the moment, one for each compoennt of the hessian (although there are 9 components to
+3d hessian, there are 3 which are identical since dxy and dyx are the same, since they are commutative) and to create the other 5
+simply hash out dxx related code and unhash the following derivative.
