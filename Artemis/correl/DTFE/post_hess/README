@@ -1,1 +1,16 @@
+In order to reform this code in its entirety, you must firstly choose how many parts that you will cut up the input data into,
 
+import numpy as np
+from sympy import *
+import pickle
+from matplotlib import cm
+import pandas as pd
+import h5py
+#I should make 5 codes to calculate
+#225GB+
+part=0#Change for each file. START FROM 0
+
+tot_parts=8
+
+where tot_parts will break up the input data, and thus you must have that many scripts in order to run the full simulation, where 
+each script will have a unique 'part' from 0 to x.
