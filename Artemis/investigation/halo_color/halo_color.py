@@ -34,10 +34,11 @@ data=data[partcl_500]
 Xc=data[:,0]
 Yc=data[:,1]
 Zc=data[:,2]
+mass=data[:,3]
 color_cd=np.zeros(len(Xc))
 del data
 
-halos=np.column_stack((Xc,Yc,Zc,color_cd))
+halos=np.column_stack((Xc,Yc,Zc,mass,color_cd))
 
 # -----------------
 #pre-binning for Halos ----------
@@ -71,8 +72,9 @@ for i in range(len(Xc)):
     grid_index_y=mth.trunc(halos[i,1]*Yc_mult-Yc_minus) 
     grid_index_z=mth.trunc(halos[i,2]*Zc_mult-Zc_minus) 
   
-    halos[i,3]=mask[grid_index_x,grid_index_y,grid_index_z]
+    halos[i,4]=mask[grid_index_x,grid_index_y,grid_index_z]
     
-f=h5py.File("/scratch/GAMNSCM2/bolchoi_z0/investigation/bolchoi_halo_colordata_grid%s_smth%s_500part.h5"%(grid_nodes,round(std_dev_phys,2)), 'w')
+f=h5py.File("/scratch/GAMNSCM2/bolchoi_z0/investigation/bolchoi_halo_colordata_grid%s_smth%s_500part_xyzm_id.h5"%(grid_nodes,round(std_dev_phys,2)), 'w')
 f.create_dataset('/group/x',data=halos)
 f.close()
+
