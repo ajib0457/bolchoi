@@ -39,7 +39,7 @@ for i in range(len(halos)):
 partcls = np.delete(partcls, (0), axis=0)
 
 #Plotting
-fig, ax = plt.subplots(figsize=(15,15),dpi=400)
+fig, ax = plt.subplots(figsize=(15,15),dpi=100)
 ax.scatter(partcls[:,0],partcls[:,2],c='r')
 plt.xlabel('x[Mpc/h]') 
 plt.ylabel('y[Mpc/h]')
