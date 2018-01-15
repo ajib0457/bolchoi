@@ -16,7 +16,7 @@ std_dev_phys=1.*s/val_phys*grid_phys
 
 #HALOS ------------
 data = pd.read_csv('/scratch/GAMNSCM2/bolchoi_z0/cat_reconfig/files/output_files/bolchoi_DTFE_rockstar_allhalos_xyz_vxyz_jxyz_m_r',sep=r"\s+",lineterminator='\n', header = None)
-data=data.as_matrix()#CREATE A NEW SAMPLE CATALOG WHICH INCLUDES XYZ_MV_JXYZ_RV,USE THIS CATALOG FOR THIS CODE AS WELL AS HALO_COLOR.PY TO REMOVE COMPLXITY
+data=data.as_matrix()
 
 #Positions
 Xc=data[:,0]
@@ -33,6 +33,7 @@ Lz=data[:,8]
 #virial mass & radius
 vmass=data[:,9]
 vradius=data[:,10]
+vradius_norm=(vradius-np.min(vradius))/(np.max(vradius)-np.min(vradius))
 del data
 #normalize all vectors
 halos_Lxyz=np.column_stack((Lx,Ly,Lz))
@@ -75,26 +76,22 @@ for i in range(len(Xc)):
     grid_index_z=mth.trunc(Zc[i]*Zc_mult-Zc_minus) 
     if (store_AM_x[grid_index_x,grid_index_y,grid_index_z]==0):#'recon_vecs_unnorm[grid_index_x,grid_index_y,grid_index_z,0]!=9 and' place this within parentheses when filtering out not situated within filament
         
-        store_V_x[grid_index_x,grid_index_y,grid_index_z]=halos_Vxyz[i,0]
-        store_V_y[grid_index_x,grid_index_y,grid_index_z]=halos_Vxyz[i,1]
-        store_V_z[grid_index_x,grid_index_y,grid_index_z]=halos_Vxyz[i,2]        
-        store_AM_x[grid_index_x,grid_index_y,grid_index_z]=halos_Lxyz[i,0]
-        store_AM_y[grid_index_x,grid_index_y,grid_index_z]=halos_Lxyz[i,1]
-        store_AM_z[grid_index_x,grid_index_y,grid_index_z]=halos_Lxyz[i,2]
+        store_V_x[grid_index_x,grid_index_y,grid_index_z]=norm_halos_Vxyz[i,0]
+        store_V_y[grid_index_x,grid_index_y,grid_index_z]=norm_halos_Vxyz[i,1]
+        store_V_z[grid_index_x,grid_index_y,grid_index_z]=norm_halos_Vxyz[i,2]        
+        store_AM_x[grid_index_x,grid_index_y,grid_index_z]=norm_halos_Lxyz[i,0]
+        store_AM_y[grid_index_x,grid_index_y,grid_index_z]=norm_halos_Lxyz[i,1]
+        store_AM_z[grid_index_x,grid_index_y,grid_index_z]=norm_halos_Lxyz[i,2]
         store_VM[grid_index_x,grid_index_y,grid_index_z]=vmass[i]
-        store_VR[grid_index_x,grid_index_y,grid_index_z]=vradius[i]
+        store_VR[grid_index_x,grid_index_y,grid_index_z]=vradius_norm[i]
 
-    else:#'elif (recon_vecs_unnorm[grid_index_x,grid_index_y,grid_index_z,0]!=9):' place this within parentheses when filtering out not situated within filament
-        resid.append(np.array([grid_index_x,grid_index_y,grid_index_z,halos_Vxyz[i,0],halos_Vxyz[i,1],halos_Vxyz[i,2],halos_Lxyz[i,0],halos_Lxyz[i,1],halos_Lxyz[i,2]],vmass[i],vradius[i]))
+    else:
+        resid.append(np.array([grid_index_x,grid_index_y,grid_index_z,norm_halos_Vxyz[i,0],norm_halos_Vxyz[i,1],norm_halos_Vxyz[i,2],norm_halos_Lxyz[i,0],norm_halos_Lxyz[i,1],norm_halos_Lxyz[i,2],vmass[i],vradius_norm[i]]))
 
+arrys=['Vx','Vy','Vz','Lx','Ly','Lz','Vmass','Vradius','resid']
 f=h5py.File("/scratch/GAMNSCM2/bolchoi_z0/investigation/bolchoi_grid%s_smth%s_VxyzLxyzVmVr_withresid_situatedingrid.h5"%(grid_nodes,round(std_dev_phys,2)), 'w')
-f.create_dataset('/V/x',data=store_V_x)
-f.create_dataset('/V/y',data=store_V_y)
-f.create_dataset('/V/z',data=store_V_z)
-f.create_dataset('/AM/x',data=store_AM_x)
-f.create_dataset('/AM/y',data=store_AM_y)
-f.create_dataset('/AM/z',data=store_AM_z)
-f.create_dataset('/VM',data=store_VM)
-f.create_dataset('/VR',data=store_VR)
-f.create_dataset('/resid',data=resid)
+diction={arrys[0]:store_V_x,arrys[1]:store_V_y,arrys[2]:store_V_z,arrys[3]:store_AM_x,arrys[4]:store_AM_y,arrys[5]:store_AM_z,arrys[6]:store_VM,arrys[7]:store_VR,arrys[8]:resid}
+for i in arrys:
+    f.create_dataset('/%s'%i,data=diction[i])
 f.close()
+
