@@ -6,20 +6,18 @@ sim_sz=250#Mpc
 in_val,fnl_val=-140,140
 tot_parts=8
 s=3.92
-slc=15
-slc_thickness=10
 #Calculate the std deviation in physical units
 grid_phys=1.*sim_sz/grid_nodes#Size of each voxel in physical units
 val_phys=1.*(2*fnl_val)/grid_nodes#Value in each grid voxel
 std_dev_phys=1.*s/val_phys*grid_phys
 
 #cutout dimensions, in pixels
-box_sz_x_min=50
-box_sz_x_max=200
-box_sz_y_min=200
-box_sz_y_max=250
-box_sz_z_min=50
-box_sz_z_max=100
+box_sz_x_min=0
+box_sz_x_max=850
+box_sz_y_min=2
+box_sz_y_max=6
+box_sz_z_min=0
+box_sz_z_max=850
 diction={}#Dictionary which will hold all arrays within script
 arrys=['recon_vecs_x','recon_vecs_y','recon_vecs_z','mask']#every changing list to call desired arrays
 for i in arrys:
@@ -52,12 +50,12 @@ for i in arrys:
 #Filter out residual halos which are not within box boundaries
 arrys=['resid'] 
 mask=np.zeros(len(diction[arrys[0]]))
-filt_x_min=np.where(diction[arrys[0]][:,0]>=1.*sim_sz/grid_nodes*box_sz_x_min)
-filt_y_min=np.where(diction[arrys[0]][:,1]>=1.*sim_sz/grid_nodes*box_sz_y_min)
-filt_z_min=np.where(diction[arrys[0]][:,2]>=1.*sim_sz/grid_nodes*box_sz_z_min)
-filt_x_max=np.where(diction[arrys[0]][:,0]<=1.*sim_sz/grid_nodes*box_sz_x_max)
-filt_y_max=np.where(diction[arrys[0]][:,1]<=1.*sim_sz/grid_nodes*box_sz_y_max)
-filt_z_max=np.where(diction[arrys[0]][:,2]<=1.*sim_sz/grid_nodes*box_sz_z_max)
+filt_x_min=np.where(diction[arrys[0]][:,0]>=box_sz_x_min)
+filt_y_min=np.where(diction[arrys[0]][:,1]>=box_sz_y_min)
+filt_z_min=np.where(diction[arrys[0]][:,2]>=box_sz_z_min)
+filt_x_max=np.where(diction[arrys[0]][:,0]<=box_sz_x_max)
+filt_y_max=np.where(diction[arrys[0]][:,1]<=box_sz_y_max)
+filt_z_max=np.where(diction[arrys[0]][:,2]<=box_sz_z_max)
 mask[filt_x_min]=1
 mask[filt_y_min]+=1
 mask[filt_z_min]+=1
