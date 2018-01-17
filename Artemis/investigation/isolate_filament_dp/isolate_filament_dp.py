@@ -91,14 +91,28 @@ a_x_new,a_y_new,a_z_new=fil_isolater(canvasx,canvasy,canvasz,slc_min,slc_max,tra
 vec_mask=np.where(a_x_new!=0)
 vecs=np.column_stack((a_x_new[vec_mask].flatten(),a_y_new[vec_mask].flatten(),a_z_new[vec_mask].flatten()))
 
+#Choose random vectors to be dp'd
+pluck=np.random.randint(0,len(vecs),size=8000)
+b=len(vecs)
+pluck=np.unique(pluck)
+a=len(pluck)
+vecs=vecs[pluck]
+#store_spin=np.zeros(int(1.*len(vecs)*(len(vecs)+1)/2))
 store_spin=[]
 for i in range(len(vecs)):
+    for j in range(i+1,len(vecs)):
     
-    spin_dot=np.inner(vecs[i,:],vecs[i+1:len(vecs),:]) #why do i need loop for this
-    store_spin.append(spin_dot)
+#    spin_dot=np.inner(vecs[i,:],vecs[i+1:len(vecs),:]) #why do i need loop for this
+#    store_spin[(len(store_spin)-1)*i:len(vecs)*i+len(vecs)-]=store_spin
+        spin_dot=np.inner(vecs[i,:],vecs[j,:]) #why do i need loop for this
+        store_spin.append(spin_dot)
 
 store_spin=np.asarray(store_spin) #run when compelte
 
 store_spin=abs(store_spin)
-plt.hist(store_spin,bins=700,density=True)
-        
+plt.hist(store_spin,bins=700)
+plt.xlabel('dot product')
+plt.ylabel('qty')
+
+plt.savefig('/import/oth3/ajib0457/bolchoi_z0/investigation/plots/filament_dp/eigvecs_dp_no_of_vecs_sampled%s_tot%s.png' %(a,b))
+
