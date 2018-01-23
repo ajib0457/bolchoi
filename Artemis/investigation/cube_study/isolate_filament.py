@@ -2,7 +2,6 @@ import numpy as np
 from mayavi import mlab
 import h5py
 import sklearn.preprocessing as skl
-import matplotlib.pyplot as plt
 
 def fil_isolater(canvasx,canvasy,canvasz,slc_min,slc_max,trans_min,trans_max,s,r,x,y,z):
     '''
@@ -70,16 +69,16 @@ fakevecs_z=np.reshape(fakevecs[:,2],(x,y,z))
 mlab.close(all=True)
 pltt=mlab.figure(size=(2000,2000))
 
-manifest=['filaments','clusters','sheets','voids']#make sure to put 'cluster' before 'filament' in this list otherwise 'filament' will supersede 'cluster' iso
-halo_mass_filt=50  #Particle cut-off threshold
+manifest=['clusters','filaments_vecs','halos_V']#make sure to put 'cluster' before 'filament' in this list otherwise 'filament' will supersede 'cluster' iso
+halo_mass_filt=500  #Particle cut-off threshold
 for i in manifest:
     #sub-sample. STORE THESE BOUNDARIES FOR EVERY NEW SAMPLE YOU ASSESS
-    box_sz_x_min=0
-    box_sz_x_max=240
-    box_sz_y_min=0
-    box_sz_y_max=100
-    box_sz_z_min=0
-    box_sz_z_max=60
+    sub_box_sz_x_min=0
+    sub_box_sz_x_max=240
+    sub_box_sz_y_min=0
+    sub_box_sz_y_max=100
+    sub_box_sz_z_min=0
+    sub_box_sz_z_max=60
     #Create canvas
     x,y,z=np.shape(diction['mask'])
     canvasx=np.zeros((x,y,z))
@@ -93,13 +92,13 @@ for i in manifest:
         canvasz[mask_indx]=fakevecs_z[mask_indx]
         
         #Function fil_isolater() inputs
-        canvasx=canvasx[box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max]
-        canvasy=canvasy[box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max]
-        canvasz=canvasz[box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max]
+        canvasx=canvasx[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
+        canvasy=canvasy[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
+        canvasz=canvasz[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
         x,y,z=np.shape(canvasx)#new dimensions of box
-        slc_min,slc_max=30,120#The length of filament, in terms of slices of sim
-        trans_min,trans_max=40,60#the translation of centre circle along 1 dimension
-        s,r=20,15   
+        slc_min,slc_max=0,170#The length of filament, in terms of slices of sim
+        trans_min,trans_max=5,75#the translation of centre circle along 1 dimension
+        s,r=20,20   
         a_x_new,a_y_new,a_z_new=fil_isolater(canvasx,canvasy,canvasz,slc_min,slc_max,trans_min,trans_max,s,r,x,y,z) 
         
         pltt_clus=mlab.pipeline.vector_field(a_x_new,a_y_new,a_z_new)#optional: vmin=0.6 and vmax=0.4
@@ -108,7 +107,7 @@ for i in manifest:
         mlab.pipeline.iso_surface(magnitude_clus, contours=[1.9, 0.5],color=(1,0,0))#this is the isosurfaces plotter. You can simply delete these two lines to plot a vector field
 #        mlab.axes(ylabel='y[Mpc/h]',xlabel='x[Mpc/h]',zlabel='z[Mpc/h]')
         
-    if i=='filaments':
+    if i=='filaments_iso':
         #mask out all but filament eigenvectors
         mask_indx=np.where(diction['mask']==2)
         canvasx[mask_indx]=diction['recon_vecs_x'][mask_indx]
@@ -116,20 +115,40 @@ for i in manifest:
         canvasz[mask_indx]=diction['recon_vecs_z'][mask_indx]
         
         #Function fil_isolater() inputs
-        canvasx=canvasx[box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max]
-        canvasy=canvasy[box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max]
-        canvasz=canvasz[box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max]
+        canvasx=canvasx[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
+        canvasy=canvasy[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
+        canvasz=canvasz[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
         x,y,z=np.shape(canvasx)#new dimensions of box
-        slc_min,slc_max=30,120#The length of filament, in terms of slices of sim
-        trans_min,trans_max=40,60#the translation of centre circle along 1 dimension
-        s,r=20,15   
+        slc_min,slc_max=0,170#The length of filament, in terms of slices of sim
+        trans_min,trans_max=5,75#the translation of centre circle along 1 dimension
+        s,r=20,20   
         a_x_new,a_y_new,a_z_new=fil_isolater(canvasx,canvasy,canvasz,slc_min,slc_max,trans_min,trans_max,s,r,x,y,z)        
         
         pltt_fil=mlab.pipeline.vector_field(a_x_new,a_y_new,a_z_new)#optional: vmin=0.6 and vmax=0.4
-        mlab.pipeline.vectors(pltt_fil,scale_factor=1,mask_points=50,line_width=0.6,color=(1,1,1))#mask_points=2 This is for the eigenvectors lSS
+        mlab.pipeline.vectors(pltt_fil,scale_factor=1,mask_points=5000000,line_width=0.6,color=(1,1,1))#mask_points=2 This is for the eigenvectors lSS
         magnitude_fil = mlab.pipeline.extract_vector_norm(pltt_fil) #this line aids in the following line to create isosurfaces.
-        mlab.pipeline.iso_surface(magnitude_fil, contours=[1.9, 0.5],color=(1,1,0),opacity=0.4)#this is the isosurfaces plotter. You can simply delete these two lines to plot a vector field
-       
+        mlab.pipeline.iso_surface(magnitude_fil, contours=[1.9, 0.5],color=(1,1,0),opacity=0.3)#this is the isosurfaces plotter. You can simply delete these two lines to plot a vector field
+ 
+    if i=='filaments_vecs':
+        #mask out all but filament eigenvectors
+        mask_indx=np.where(diction['mask']==2)
+        canvasx[mask_indx]=diction['recon_vecs_x'][mask_indx]
+        canvasy[mask_indx]=diction['recon_vecs_y'][mask_indx]
+        canvasz[mask_indx]=diction['recon_vecs_z'][mask_indx]
+        
+        #Function fil_isolater() inputs
+        canvasx=canvasx[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
+        canvasy=canvasy[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
+        canvasz=canvasz[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
+        x,y,z=np.shape(canvasx)#new dimensions of box
+        slc_min,slc_max=0,170#The length of filament, in terms of slices of sim
+        trans_min,trans_max=5,75#the translation of centre circle along 1 dimension
+        s,r=20,20   
+        a_x_new,a_y_new,a_z_new=fil_isolater(canvasx,canvasy,canvasz,slc_min,slc_max,trans_min,trans_max,s,r,x,y,z)        
+        
+        pltt_fil=mlab.pipeline.vector_field(a_x_new,a_y_new,a_z_new)#optional: vmin=0.6 and vmax=0.4
+        mlab.pipeline.vectors(pltt_fil,scale_factor=2,mask_points=60,line_width=0.6,color=(1,1,1))#mask_points=2 This is for the eigenvectors lSS
+      
     if i=='sheets':
         #mask out all but sheet eigenvectors
         mask_indx=np.where(diction['mask']==1)
@@ -138,19 +157,19 @@ for i in manifest:
         canvasz[mask_indx]=diction['recon_vecs_z'][mask_indx]
         
         #Function fil_isolater() inputs
-        canvasx=canvasx[box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max]
-        canvasy=canvasy[box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max]
-        canvasz=canvasz[box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max]
+        canvasx=canvasx[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
+        canvasy=canvasy[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
+        canvasz=canvasz[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
         x,y,z=np.shape(canvasx)#new dimensions of box
-        slc_min,slc_max=0,240#The length of filament, in terms of slices of sim
-        trans_min,trans_max=40,60#the translation of centre circle along 1 dimension
-        s,r=20,1000000   
+        slc_min,slc_max=0,170#The length of filament, in terms of slices of sim
+        trans_min,trans_max=5,75#the translation of centre circle along 1 dimension
+        s,r=20,20   
         a_x_new,a_y_new,a_z_new=fil_isolater(canvasx,canvasy,canvasz,slc_min,slc_max,trans_min,trans_max,s,r,x,y,z)
         
         pltt_sheet=mlab.pipeline.vector_field(a_x_new,a_y_new,a_z_new)#optional: vmin=0.6 and vmax=0.4
         mlab.pipeline.vectors(pltt_sheet,scale_factor=1,mask_points=200000,line_width=0.6,color=(0.2,0.2,0.9))#mask_points=2 This is for the eigenvectors lSS
         magnitude_sht = mlab.pipeline.extract_vector_norm(pltt_sheet) #this line aids in the following line to create isosurfaces.
-        mlab.pipeline.iso_surface(magnitude_sht, contours=[1.9, 0.5],color=(0.2,0.2,0.9),opacity=0.2)#this is the isosurfaces plotter. You can simply delete these two lines to plot a vector field
+        mlab.pipeline.iso_surface(magnitude_sht, contours=[1.9, 0.5],color=(0.2,0.2,0.9),opacity=0.3)#this is the isosurfaces plotter. You can simply delete these two lines to plot a vector field
         mlab.axes(ylabel='y[Mpc/h]',xlabel='x[Mpc/h]',zlabel='z[Mpc/h]')
 
     if i=='voids':
@@ -161,19 +180,19 @@ for i in manifest:
         canvasz[mask_indx]=fakevecs_z[mask_indx]
         
         #Function fil_isolater() inputs
-        canvasx=canvasx[box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max]
-        canvasy=canvasy[box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max]
-        canvasz=canvasz[box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max]
+        canvasx=canvasx[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
+        canvasy=canvasy[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
+        canvasz=canvasz[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
         x,y,z=np.shape(canvasx)#new dimensions of box
-        slc_min,slc_max=30,120#The length of filament, in terms of slices of sim
-        trans_min,trans_max=40,60#the translation of centre circle along 1 dimension
-        s,r=20,15   
+        slc_min,slc_max=0,170#The length of filament, in terms of slices of sim
+        trans_min,trans_max=5,75#the translation of centre circle along 1 dimension
+        s,r=20,20  
         a_x_new,a_y_new,a_z_new=fil_isolater(canvasx,canvasy,canvasz,slc_min,slc_max,trans_min,trans_max,s,r,x,y,z)
         
         pltt_vod=mlab.pipeline.vector_field(a_x_new,a_y_new,a_z_new)#optional: vmin=0.6 and vmax=0.4
         mlab.pipeline.vectors(pltt_vod,scale_factor=1,mask_points=5000,line_width=0.6,color=(0.06666, 0.06666, 0.1804))#mask_points=2 This is for the eigenvectors lSS
         magnitude_vod = mlab.pipeline.extract_vector_norm(pltt_vod) #this line aids in the following line to create isosurfaces.
-        mlab.pipeline.iso_surface(magnitude_vod, contours=[1.9, 0.5],color=(0.06666, 0.06666, 0.1804),name='void')#this is the isosurfaces plotter. You can simply delete these two lines to plot a vector field
+        mlab.pipeline.iso_surface(magnitude_vod, contours=[1.9, 0.5],color=(0.06666, 0.06666, 0.1804),opacity=0.3)#this is the isosurfaces plotter. You can simply delete these two lines to plot a vector field
 
     if i=='halos_L':
         #Plot halo AM vectors
@@ -185,50 +204,107 @@ for i in manifest:
         diction['Lx'][partcl_500]=0
         diction['Ly'][partcl_500]=0
         diction['Lz'][partcl_500]=0
-        pltt_fil=mlab.pipeline.vector_field(diction['Lx'][box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max],diction['Ly'][box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max],diction['Lz'][box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max])#optional: vmin=0.6 and vmax=0.4
-        mlab.pipeline.vectors(pltt_fil,scale_factor=5,line_width=0.6,color=(0.06666, 0.06666, 0.8))#mask_points=2 This is for the eigenvectors lSS               
-        #plot residuals which could not be binned due to overlap issues
+        
+        canvasx= diction['Lx']
+        canvasy= diction['Ly']
+        canvasz= diction['Lz']
+        
+        #Function fil_isolater() inputs
+        canvasx=canvasx[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
+        canvasy=canvasy[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
+        canvasz=canvasz[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
+        x,y,z=np.shape(canvasx)#new dimensions of box
+        slc_min,slc_max=0,170#The length of filament, in terms of slices of sim
+        trans_min,trans_max=5,75#the translation of centre circle along 1 dimension
+        s,r=20,20   
+        a_x_new,a_y_new,a_z_new=fil_isolater(canvasx,canvasy,canvasz,slc_min,slc_max,trans_min,trans_max,s,r,x,y,z)
+        line_width=2
+        scale_factor=5
+        color=(1, 1, 0)
+        pltt_fil=mlab.pipeline.vector_field(a_x_new,a_y_new,a_z_new)#optional: vmin=0.6 and vmax=0.4
+        mlab.pipeline.vectors(pltt_fil,scale_factor=scale_factor,line_width=line_width,color=color)#mask_points=2 This is for the eigenvectors lSS               
+        #Mask out particles and subsample
         #Resid structure: x(0),y(1),z(2) Vx(3),Vy(4),Vz(5) Lx(6),Ly(7),Lz(8) Vmass(9),Vradius(10)
-#        partcl_500=np.where((diction['resid'][:,9]/(1.35*10**8))<halo_mass_filt)
-#        diction['resid'][partcl_500]=0
-#        for j in range(len(diction['resid'])):
-#            x=diction['resid'][j,0]
-#            y=diction['resid'][j,1]
-#            z=diction['resid'][j,2]
-#            if (box_sz_x_min<x<=box_sz_x_max and box_sz_y_min<y<=box_sz_y_max and box_sz_z_min<z<=box_sz_z_max and diction['mask'][x,y,z]==2): 
-#                pltt_fil=mlab.pipeline.vector_field(diction['resid'][j,0],diction['resid'][j,1],diction['resid'][j,2],diction['resid'][j,6],diction['resid'][j,7],diction['resid'][j,8])
-#                mlab.pipeline.vectors(pltt_fil,scale_factor=3,line_width=0.6,color=(0.06666, 0.06666, 0.8))
+        partcl_500=np.where((diction['resid'][:,9]/(1.35*10**8))>halo_mass_filt)
+        filt_x_min=np.where(diction['resid'][:,0]>sub_box_sz_x_min)#THESE WILL CHANGE FOR EACH SUBSAMPLE
+        filt_y_min=np.where(diction['resid'][:,1]>box_sz_y_min)#THESE WILL CHANGE FOR EACH SUBSAMPLE
+        filt_z_min=np.where(diction['resid'][:,2]>sub_box_sz_z_min)#THESE WILL CHANGE FOR EACH SUBSAMPLE
+        filt_x_max=np.where(diction['resid'][:,0]<sub_box_sz_x_max)#THESE WILL CHANGE FOR EACH SUBSAMPLE
+        filt_y_max=np.where(diction['resid'][:,1]<box_sz_y_min+sub_box_sz_y_max)#THESE WILL CHANGE FOR EACH SUBSAMPLE
+        filt_z_max=np.where(diction['resid'][:,2]<sub_box_sz_z_max)#THESE WILL CHANGE FOR EACH SUBSAMPLE
+        mask=np.zeros(len(diction['resid']))
+        mask[filt_x_min]=1
+        mask[filt_y_min]+=1
+        mask[filt_z_min]+=1
+        mask[filt_x_max]+=1
+        mask[filt_y_max]+=1
+        mask[filt_z_max]+=1
+        mask[partcl_500]+=1
+        sub_smpl=np.asarray(np.where(mask==7)).flatten()
+        for j in sub_smpl:
+            x=diction['resid'][j,0]
+            y=diction['resid'][j,1]
+            z=diction['resid'][j,2]
+            #This if statement used to isolate filament within subsample 
+            if (a_x_new[int(x),int(y-box_sz_y_min),int(z)]!=0):#THESE WILL CHANGE FOR EACH SUBSAMPLE 
+                pltt_fil=mlab.pipeline.vector_field(x,y-box_sz_y_min,z,diction['resid'][j,6],diction['resid'][j,7],diction['resid'][j,8])#AM vectors
+                mlab.pipeline.vectors(pltt_fil,scale_factor=scale_factor,line_width=line_width,color=color)
                 
     if i=='halos_V':
-        #Plot halo velocity vectors
+        #Plot halo Velocity vectors
         partcl_500=np.where((diction['Vmass']/(1.35*10**8))<halo_mass_filt)#filter out halos with <500 particles
-#        mask_v=(diction['mask']!=2)
-#        diction['Vx'][mask_v]=0
-#        diction['Vy'][mask_v]=0
-#        diction['Vz'][mask_v]=0
+        mask_v=(diction['mask']!=2)
+        diction['Vx'][mask_v]=0
+        diction['Vy'][mask_v]=0
+        diction['Vz'][mask_v]=0
         diction['Vx'][partcl_500]=0
         diction['Vy'][partcl_500]=0
         diction['Vz'][partcl_500]=0
-        pltt_fil=mlab.pipeline.vector_field(diction['Vx'][box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max],diction['Vy'][box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max],diction['Vz'][box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max])#optional: vmin=0.6 and vmax=0.4
-        mlab.pipeline.vectors(pltt_fil,scale_factor=20,line_width=2,color=(0,0,0))#mask_points=2 This is for the eigenvectors lSS
-        #plot residuals which could not be binned due to overlap issues
+        
+        canvasx= diction['Vx']
+        canvasy= diction['Vy']
+        canvasz= diction['Vz']
+        
+        #Function fil_isolater() inputs
+        canvasx=canvasx[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
+        canvasy=canvasy[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
+        canvasz=canvasz[sub_box_sz_x_min:sub_box_sz_x_max,sub_box_sz_y_min:sub_box_sz_y_max,sub_box_sz_z_min:sub_box_sz_z_max]
+        x,y,z=np.shape(canvasx)#new dimensions of box
+        slc_min,slc_max=0,170#The length of filament, in terms of slices of sim
+        trans_min,trans_max=5,75#the translation of centre circle along 1 dimension
+        s,r=20,20   
+        a_x_new,a_y_new,a_z_new=fil_isolater(canvasx,canvasy,canvasz,slc_min,slc_max,trans_min,trans_max,s,r,x,y,z)
+        line_width=2
+        scale_factor=5
+        color=(1, 1, 0)
+        pltt_fil=mlab.pipeline.vector_field(a_x_new,a_y_new,a_z_new)#optional: vmin=0.6 and vmax=0.4
+        mlab.pipeline.vectors(pltt_fil,scale_factor=scale_factor,line_width=line_width,color=color)#mask_points=2 This is for the eigenvectors lSS               
+        #Mask out particles and subsample
         #Resid structure: x(0),y(1),z(2) Vx(3),Vy(4),Vz(5) Lx(6),Ly(7),Lz(8) Vmass(9),Vradius(10)
-#        partcl_500=np.where((diction['resid'][:,9]/(1.35*10**8))<halo_mass_filt)                   
-#        diction['resid'][partcl_500]=0
-#        for j in range(len(diction['resid'])):
-#            x=diction['resid'][j,0]
-#            y=diction['resid'][j,1]
-#            z=diction['resid'][j,2]
-#            if (box_sz_x_min<x<=box_sz_x_max and box_sz_y_min<y<=box_sz_y_max and box_sz_z_min<z<=box_sz_z_max and diction['mask'][x,y,z]==2):
-#                pltt_fil=mlab.pipeline.vector_field(diction['resid'][j,0],diction['resid'][j,1],diction['resid'][j,2],diction['resid'][j,3],diction['resid'][j,4],diction['resid'][j,5])
-#                mlab.pipeline.vectors(pltt_fil,scale_factor=3,line_width=0.6,color=(0.06666, 0.06666, 0.8))   
-                     
-    if i=='halos_Vradius':
-        #Scatter halos with size prop. to Vradius
-        canvasx=diction['Vradius']
-        pltt_fil=mlab.points3d(canvasx[box_sz_x_min:box_sz_x_max,box_sz_y_min:box_sz_y_max,box_sz_z_min:box_sz_z_max],scale_factor=0.5)
-
-
+        partcl_500=np.where((diction['resid'][:,9]/(1.35*10**8))>halo_mass_filt)
+        filt_x_min=np.where(diction['resid'][:,0]>sub_box_sz_x_min)#THESE WILL CHANGE FOR EACH SUBSAMPLE
+        filt_y_min=np.where(diction['resid'][:,1]>box_sz_y_min)#THESE WILL CHANGE FOR EACH SUBSAMPLE
+        filt_z_min=np.where(diction['resid'][:,2]>sub_box_sz_z_min)#THESE WILL CHANGE FOR EACH SUBSAMPLE
+        filt_x_max=np.where(diction['resid'][:,0]<sub_box_sz_x_max)#THESE WILL CHANGE FOR EACH SUBSAMPLE
+        filt_y_max=np.where(diction['resid'][:,1]<box_sz_y_min+sub_box_sz_y_max)#THESE WILL CHANGE FOR EACH SUBSAMPLE
+        filt_z_max=np.where(diction['resid'][:,2]<sub_box_sz_z_max)#THESE WILL CHANGE FOR EACH SUBSAMPLE
+        mask=np.zeros(len(diction['resid']))
+        mask[filt_x_min]=1
+        mask[filt_y_min]+=1
+        mask[filt_z_min]+=1
+        mask[filt_x_max]+=1
+        mask[filt_y_max]+=1
+        mask[filt_z_max]+=1
+        mask[partcl_500]+=1
+        sub_smpl=np.asarray(np.where(mask==7)).flatten()
+        for j in sub_smpl:
+            x=diction['resid'][j,0]
+            y=diction['resid'][j,1]
+            z=diction['resid'][j,2]
+            #This if statement used to isolate filament within subsample 
+            if (a_x_new[int(x),int(y-box_sz_y_min),int(z)]!=0):#THESE WILL CHANGE FOR EACH SUBSAMPLE 
+                pltt_fil=mlab.pipeline.vector_field(x,y-box_sz_y_min,z,diction['resid'][j,3],diction['resid'][j,4],diction['resid'][j,5])#AM vectors
+                mlab.pipeline.vectors(pltt_fil,scale_factor=scale_factor,line_width=line_width,color=color)
 
 #mlab.axes(ylabel='y[Mpc/h]',xlabel='x[Mpc/h]',zlabel='z[Mpc/h]')
 #v=mlab.view(azimuth=270.1,elevation=90,distance=2000)#this creates a variable, v, to which mayavi saves the azimuth & elevation angle to
