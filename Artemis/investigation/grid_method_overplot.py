@@ -35,6 +35,8 @@ x=np.linspace(-1,1,1000)
 normstdis=np.zeros((1000,1))
 normstdis=1/(np.sqrt(2*(sigma**2)*mth.pi))*np.exp(-((x-mu)**2)/(2*sigma**2))
 '''
+
+fig=plt.figure()
 plt.plot(c,np.exp(loglike),color='b',label='loglike using binned data')
 
 plt.xlabel('Parameter (c)')
@@ -42,3 +44,25 @@ plt.ylabel('Likelihood')
 plt.title('Likelihood Curve: c= %s and error=%s'%(c_value_loglike,sig_c))#how to make complete sigma number show up in title?
 plt.legend()
 #plt.savefig('/suphys/ajib0457/snapshot_012_LSS_class/correl/DTFE/plots/MLE_grid_methd/max-likelihood_ndotprodbins%s_c%s_error%s_grid%d_fil_Log%s-%s_smth%skpc_binr.png'%(n_dot_prod/2,c_value_loglike,sig_c,grid_nodes,low_int_mass,hi_int_mass,std_dev_phys))
+
+#data_mod overplot
+bins=15
+#plotting data
+data=np.histogram(costheta,bins=bins,density=True)
+bin_vals=np.delete(data[1],len(data[1])-1,0)
+figure=plt.figure(figsize=(8,5),dpi=50)
+plt.plot(bin_vals,data[0],color='r',label='data')
+plt.axhline(y=1, xmin=0, xmax=15, color = 'k',linestyle='--')
+
+dotprodval=np.round(np.linspace(0,bin_vals[len(bin_vals)-1],1000),3)#value for each index in costheta array
+#plotting model with errors
+model=(1-c_value_loglike)*np.sqrt(1+1.*(c_value_loglike/2))*(1-c_value_loglike*(1-1.5*(dotprodval)**2))**(-1.5)
+model_min=(1-(c_value_loglike-sig_c))*np.sqrt(1+((c_value_loglike-sig_c)/2))*(1-(c_value_loglike-sig_c)*(1-1.5*(dotprodval)**2))**(-1.5)
+model_max=(1-(c_value_loglike+sig_c))*np.sqrt(1+((c_value_loglike+sig_c)/2))*(1-(c_value_loglike+sig_c)*(1-1.5*(dotprodval)**2))**(-1.5)
+
+plt.plot(dotprodval,model,color='b',label='model')
+plt.plot(dotprodval,model_min,color='g',label='model_error_min')
+plt.plot(dotprodval,model_max,color='y',label='model_error_max')
+#plt.axis((0,1,0.8,1.2))
+#plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.25),ncol=3, fancybox=True, shadow=True)
+plt.legend(loc='upper left')
