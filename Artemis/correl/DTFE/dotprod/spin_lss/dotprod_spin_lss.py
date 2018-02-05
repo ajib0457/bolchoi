@@ -28,7 +28,7 @@ for part in range(tot_parts):
     recon_vecs_y[nrows_in:nrows_fn]=f['/group%d/y'%part][:]
     recon_vecs_z[nrows_in:nrows_fn]=f['/group%d/z'%part][:]
     f.close()
-    f2=h5py.File("/scratch/GAMNSCM2/bolchoi_z0/correl/my_den/files/output_files/eigvecs/fil_recon_vecs_DTFE_gd%d_smth%sMpc_%d_mask.h5" %(grid_nodes,round(std_dev_phys,3),part), 'r')
+    f2=h5py.File("/scratch/GAMNSCM2/bolchoi_z0/correl/DTFE/files/output_files/eigvecs/fil_recon_vecs_DTFE_gd%d_smth%sMpc_%d_mask.h5" %(grid_nodes,round(std_dev_phys,3),part), 'r')
     mask[nrows_in:nrows_fn]=f2['/mask%d'%part][:]
     f2.close()
 
