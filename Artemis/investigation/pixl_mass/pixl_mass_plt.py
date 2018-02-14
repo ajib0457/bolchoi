@@ -29,30 +29,19 @@ for i in range(no_mass_bins):
     sum_pxls[i]=sum(a[pixls])
     pxl_qty[i]=y
     
-
-#plot
-'''
-bins=99
-data_pxl_qty=np.histogram(pxl_qty,bins=bins,density=True)
-bin_vals_pxl_qty=np.delete(data_pxl_qty[1],len(data_pxl_qty[1])-1,0)
-
-data_sum_pxls=np.histogram(sum_pxls,bins=bins,density=True)
-bin_vals_sum_pxls=np.delete(data_sum_pxls[1],len(data_sum_pxls[1])-1,0)
-'''
 #normalize data
-pxl_qty=(pxl_qty-np.min(pxl_qty))/(np.max(pxl_qty)-np.min(pxl_qty))
-sum_pxls=(sum_pxls-np.min(sum_pxls))/(np.max(sum_pxls)-np.min(sum_pxls))
-
+pxl_qty_norm=(pxl_qty-np.min(pxl_qty))/(np.max(pxl_qty)-np.min(pxl_qty))
+sum_pxls_norm=(sum_pxls-np.min(sum_pxls))/(np.max(sum_pxls)-np.min(sum_pxls))
+mass_bins=np.arange(min_mass,max_mass,mass_intvl)
+#plot
 plt.figure(figsize=(10,7),dpi=100)
 ax1=plt.subplot2grid((1,1), (0,0)) 
 mass_bins=np.arange(min_mass,max_mass,mass_intvl)
-plt.plot(bin_vals_pxl_qty,data_pxl_qty[0],label='pixels qty')
-plt.plot(bin_vals_sum_pxls,data_sum_pxls[0],label='pixels total')
+plt.plot(mass_bins,pxl_qty_norm,label='pixels qty')
+plt.plot(mass_bins,sum_pxls_norm,label='pixels total')
 plt.title('pixels containing mass')    
 plt.xlabel('M_solar masses') 
 plt.ylabel('pixels qty')    
 plt.legend()
+plt.title('pxl_qty:%s sum_pxls:%s'%(pxl_qty[0],sum_pxls[0]))#perhaps do this for not just the first bin
 plt.savefig('/scratch/GAMNSCM2/bolchoi_z0/investigation/bolchoi_pxl_mass_plt.png')
-    
-    
-    
