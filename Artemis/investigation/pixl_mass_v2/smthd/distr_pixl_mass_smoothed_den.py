@@ -4,7 +4,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import h5py
 
-
+sim_sz=250
 grid_nodes=850
 f1=h5py.File("/scratch/GAMNSCM2/bolchoi_z0/my_den/den_grid%s_halo_bin_bolchoi" %grid_nodes, 'r')
 a=f1['/halo'][:]
@@ -23,7 +23,13 @@ fft_dxx=np.fft.fftn(h)
 fft_db=np.fft.fftn(a)
 ifft_a=np.fft.ifftn(np.multiply(fft_dxx,fft_db)).real
 
+grid_phys=1.*sim_sz/grid_nodes#Size of each voxel in physical units
+val_phys=1.*(2*fnl_val)/grid_nodes#Value in each grid voxel
+std_dev_phys=1.*s/val_phys*grid_phys
 
+f=h5py.File("/scratch/GAMNSCM2/bolchoi_z0/my_den/den_grid%s_halo_bin_bolchoi_smth%s" %(grid_nodes,std_dev_phys), 'w')
+f.create_dataset('/denssmth',data=ifft_a)
+f.close()
 
 #code to calculate pixel mass distribution. can be used for smoothed/non-smoothed density field
 ifft_a=ifft_a.flatten()
