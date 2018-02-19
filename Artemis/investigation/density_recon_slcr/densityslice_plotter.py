@@ -27,16 +27,17 @@ for part in range(tot_parts):#here I have to figure out how these have been stor
     mask[nrows_in:nrows_fn]=f2['/mask%d'%part][:]
     f2.close()
 mask=np.reshape(mask,(grid_nodes,grid_nodes,grid_nodes))#density field
-f1=h5py.File("/scratch/GAMNSCM2/bolchoi_z0/my_den/den_grid%s_halo_bin_bolchoi" %grid_nodes, 'r')
-a=f1['/halo'][:]
+f=h5py.File("/scratch/GAMNSCM2/bolchoi_z0/my_den/den_grid%s_halo_bin_bolchoi_smth%s" %(grid_nodes,std_dev_phys), 'r')
+a=f['/denssmth'][:]
+f.close()
 
 #smooth density field
-c=np.reshape(a,(grid_nodes,grid_nodes,grid_nodes))#density field
+c_smoothed=np.reshape(a,(grid_nodes,grid_nodes,grid_nodes))#density field
 s=3.92#standard deviation
-c_smoothed=ndimage.filters.gaussian_filter(c,s)
+#c_smoothed=ndimage.filters.gaussian_filter(c,s)
 
 #slices options
-slc=300
+slc=425
 
 plt.figure(figsize=(20,20),dpi=100)
 #The two function below are purely for the color scheme of the imshow plot: Classifier, used to create discrete imshow
@@ -68,7 +69,7 @@ plt.title('Classifier')
 #plt.xlabel('z')
 #plt.ylabel('x')
 cmap = plt.get_cmap('jet')#This is where you can change the color scheme
-ax.imshow(np.rot90(mask[slc,:,:],1), interpolation='nearest', cmap=cmap,extent=[0,850,0,850])#The colorbar will adapt to data
+ax.imshow(np.rot90(mask[:,slc,:],1), interpolation='nearest', cmap=cmap,extent=[0,850,0,850])#The colorbar will adapt to data
 colorbar_index(ncolors=4, cmap=cmap)
 
 #Density field
@@ -76,8 +77,7 @@ ax5=plt.subplot2grid((2,1), (1,0))
 plt.title('classified image')
 cmapp = plt.get_cmap('jet')
 scl_plt=35#reduce scale of density fields and eigenvalue subplots by increasing number
-dn_fl_plt=ax5.imshow(np.power(np.rot90(c_smoothed[slc,:,:],1),1./scl_plt),cmap=cmapp,extent=[0,850,0,850])#The colorbar will adapt to data
+dn_fl_plt=ax5.imshow(np.power(np.rot90(c_smoothed[:,slc,:],1),1./scl_plt),cmap=cmapp,extent=[0,850,0,850])#The colorbar will adapt to data
 plt.colorbar(dn_fl_plt,cmap=cmapp)
 
-plt.savefig('/scratch/GAMNSCM2/bolchoi_z0/investigation/bolchoi_recon_smthden_gd%d_slc%d_smth%sMpc_xplane.png' %(grid_nodes,slc,std_dev_phys))
-
+plt.savefig('/scratch/GAMNSCM2/bolchoi_z0/investigation/bolchoi_recon_DTFEsmthden_gd%d_slc%d_smth%sMpc_yplane.png' %(grid_nodes,slc,std_dev_phys))
