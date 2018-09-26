@@ -13,11 +13,11 @@ std_dev_phys=1.*s/val_phys*grid_phys
 
 #cutout dimensions, in pixels
 box_sz_x_min=0
-box_sz_x_max=850
-box_sz_y_min=2
-box_sz_y_max=6
+box_sz_x_max=240
+box_sz_y_min=140
+box_sz_y_max=290
 box_sz_z_min=0
-box_sz_z_max=850
+box_sz_z_max=240
 diction={}#Dictionary which will hold all arrays within script
 arrys=['recon_vecs_x','recon_vecs_y','recon_vecs_z','mask']#every changing list to call desired arrays
 for i in arrys:
@@ -27,12 +27,12 @@ for part in range(tot_parts):#here I have to figure out how these have been stor
 #into 1 array
     nrows_in=int(1.*(grid_nodes**3)/tot_parts*part)
     nrows_fn=nrows_in+int(1.*(grid_nodes**3)/tot_parts)
-    f=h5py.File("/scratch/GAMNSCM2/bolchoi_z0/correl/my_den/files/output_files/eigvecs/fil_recon_vecs_DTFE_gd%d_smth%sMpc_%d.h5" %(grid_nodes,round(std_dev_phys,3),part), 'r')
+    f=h5py.File("/scratch/GAMNSCM2/bolchoi_z0/correl/DTFE/files/output_files/eigvecs/fil_recon_vecs_DTFE_gd%d_smth%sMpc_%d.h5" %(grid_nodes,round(std_dev_phys,3),part), 'r')
     diction[arrys[0]][nrows_in:nrows_fn]=f['/group%d/x'%part][:]
     diction[arrys[1]][nrows_in:nrows_fn]=f['/group%d/y'%part][:]
     diction[arrys[2]][nrows_in:nrows_fn]=f['/group%d/z'%part][:]
     f.close()
-    f2=h5py.File("/scratch/GAMNSCM2/bolchoi_z0/correl/my_den/files/output_files/eigvecs/fil_recon_vecs_DTFE_gd%d_smth%sMpc_%d_mask.h5" %(grid_nodes,round(std_dev_phys,3),part), 'r')
+    f2=h5py.File("/scratch/GAMNSCM2/bolchoi_z0/correl/DTFE/files/output_files/eigvecs/fil_recon_vecs_DTFE_gd%d_smth%sMpc_%d_mask.h5" %(grid_nodes,round(std_dev_phys,3),part), 'r')
     diction[arrys[3]][nrows_in:nrows_fn]=f2['/mask%d'%part][:]
     f2.close()
     
@@ -66,7 +66,7 @@ halo_filt=(mask==6)
 diction[arrys[0]]=diction[arrys[0]][halo_filt]
 
 arrys=['recon_vecs_x','recon_vecs_y','recon_vecs_z','mask','Vx','Vy','Vz','Lx','Ly','Lz','Vmass','Vradius','resid']
-f=h5py.File("/scratch/GAMNSCM2/bolchoi_z0/investigation/my_den_cutout_%s_%s_%s_%s_%s_%s_grid%d_smth%sMpc_eig_xyz_mask_Vxyz_Lxyz_Vm_Vr_resid.h5" %(box_sz_x_min,box_sz_x_max,box_sz_y_min,box_sz_y_max,box_sz_z_min,box_sz_z_max,grid_nodes,round(std_dev_phys,2)), 'w')
+f=h5py.File("/scratch/GAMNSCM2/bolchoi_z0/investigation/DTFE_cutout_%s_%s_%s_%s_%s_%s_grid%d_smth%sMpc_eig_xyz_mask_Vxyz_Lxyz_Vm_Vr_resid.h5" %(box_sz_x_min,box_sz_x_max,box_sz_y_min,box_sz_y_max,box_sz_z_min,box_sz_z_max,grid_nodes,round(std_dev_phys,2)), 'w')
 for i in arrys:
     f.create_dataset('/%s'%i,data=diction[i])
 f.close()
