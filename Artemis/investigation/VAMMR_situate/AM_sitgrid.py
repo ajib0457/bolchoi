@@ -85,7 +85,7 @@ for i in range(len(Xc)):
         store_VM[grid_index_x,grid_index_y,grid_index_z]=vmass[i]
         store_VR[grid_index_x,grid_index_y,grid_index_z]=vradius_norm[i]
 
-    else:
+    else:#'elif (recon_vecs_unnorm[grid_index_x,grid_index_y,grid_index_z,0]!=9):' place this within parentheses when filtering out not situated within filament
         resid.append(np.array([grid_index_x,grid_index_y,grid_index_z,norm_halos_Vxyz[i,0],norm_halos_Vxyz[i,1],norm_halos_Vxyz[i,2],norm_halos_Lxyz[i,0],norm_halos_Lxyz[i,1],norm_halos_Lxyz[i,2],vmass[i],vradius_norm[i]]))
 
 arrys=['Vx','Vy','Vz','Lx','Ly','Lz','Vmass','Vradius','resid']
